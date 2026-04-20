@@ -1,0 +1,40 @@
+# Stack Evolution API (extraído do repo vps).
+# Postgres e Redis: instâncias já existentes no servidor; crie um database para a Evolution
+# e use um DB lógico Redis (ex.: /1) só para ela. URIs via variáveis de ambiente.
+
+services:
+  evolution-api:
+    image: evoapicloud/evolution-api:v2.3.6
+    container_name: evolution_api
+    restart: unless-stopped
+    environment:
+      # Server (doc: https://doc.evolution-api.com/v2/pt/env)
+      SERVER_TYPE: ${EVOLUTION_SERVER_TYPE:-http}
+      SERVER_PORT: "8080"
+      SERVER_URL: ${EVOLUTION_SERVER_URL}
+      WEBSOCKET_ENABLED: ${EVOLUTION_WEBSOCKET_ENABLED:-true}
+      WEBSOCKET_GLOBAL_EVENTS: "false"
+      WEBSOCKET_ALLOWED_HOSTS: ${EVOLUTION_WEBSOCKET_ALLOWED_HOSTS:-*}
+      TELEMETRY_ENABLED: ${EVOLUTION_TELEMETRY_ENABLED:-false}
+      CORS_ORIGIN: ${EVOLUTION_CORS_ORIGIN:-*}
+      AUTHENTICATION_API_KEY: ${EVOLUTION_AUTHENTICATION_API_KEY}
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: ${EVOLUTION_DATABASE_URI}
+      DATABASE_CONNECTION_CLIENT_NAME: ${EVOLUTION_DATABASE_CLIENT_NAME:-evolution_vps}
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: ${EVOLUTION_REDIS_URI}
+      CACHE_REDIS_PREFIX_KEY: ${EVOLUTION_REDIS_PREFIX_KEY:-evolution}
+      CACHE_LOCAL_ENABLED: "false"
+      RABBITMQ_ENABLED: "false"
+      DEL_INSTANCE: "false"
+      QRCODE_LIMIT: ${EVOLUTION_QRCODE_LIMIT:-30}
+      QRCODE_COLOR: ${EVOLUTION_QRCODE_COLOR:-#198754}
+      CONFIG_SESSION_PHONE_CLIENT: ${EVOLUTION_CONFIG_SESSION_PHONE_CLIENT:-Chrome}
+      CONFIG_SESSION_PHONE_NAME: ${EVOLUTION_CONFIG_SESSION_PHONE_NAME:-Chrome}
+      CONFIG_SESSION_PHONE_VERSION: ${EVOLUTION_CONFIG_SESSION_PHONE_VERSION:-2.3000.1030831524}
+    volumes:
+      - evolution_instances:/evolution/instances
+
+volumes:
+  evolution_instances:
